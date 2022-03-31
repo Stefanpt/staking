@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
-contract GracelandNFTStaking is Ownable, IERC721Receiver {
+contract ChamberStaking is Ownable, IERC721Receiver {
 
     IERC721 private nft;
     IERC20 private token;
