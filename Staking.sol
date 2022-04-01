@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT LICENSE
 
-pragma solidity 0.8.4;
+pragma solidity ^0.8.4;
 
-import "./IERC20.sol";
-import "https://github.com/net2devcrypto/n2dstaking/Collection.sol";
+import "https://github.com/Stefanpt/staking/blob/main/IERC20.sol";
+import "https://github.com/Stefanpt/staking/blob/main/IERC721.sol";
+
 
 contract NFTStaking is Ownable, IERC721Receiver {
 
@@ -21,13 +22,13 @@ contract NFTStaking is Ownable, IERC721Receiver {
   event Claimed(address owner, uint256 amount);
 
   // reference to the Block NFT contract
-  Collection nft;
+  IERC721 public nft;
   IERC20 public token;
 
   // maps tokenId to stake
   mapping(uint256 => Stake) public vault; 
 
-   constructor(Collection _nft, IERC20 _rewardsToken) { 
+   constructor(IERC721 _nft, IERC20 _rewardsToken) { 
     nft = _nft;
     token = _rewardsToken;
   }
