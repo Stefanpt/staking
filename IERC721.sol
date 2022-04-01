@@ -1,8 +1,6 @@
 pragma solidity ^0.8.4;
+// SPDX-License-Identifier: UNLICENSED
 
-/// @title ERC-721 Non-Fungible Token Standard
-/// @dev See https://eips.ethereum.org/EIPS/eip-721
-///  Note: the ERC-165 identifier for this interface is 0x80ac58cd.
 interface ERC721 /* is ERC165 */ {
 
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
