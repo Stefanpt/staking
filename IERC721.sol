@@ -19,5 +19,5 @@ interface ERC721 {
     function mintForAddress(uint256 _mintAmount, address _receiver) external;
     function walletOfOwner(address _owner) external view returns (uint256[] memory);
     function tokenURI(uint256 _tokenId) external view returns (string memory);
-    function totalSupply() external view returns (uint256);
+
 }
