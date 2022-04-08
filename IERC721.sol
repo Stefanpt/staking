@@ -1,7 +1,7 @@
-// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.4;
+// SPDX-License-Identifier: UNLICENSED
 
-interface ERC721a {
+interface ERC721 {
 
     event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
     event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);
