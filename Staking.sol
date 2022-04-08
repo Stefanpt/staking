@@ -6,7 +6,7 @@ import "https://github.com/Stefanpt/staking/blob/main/IERC20.sol";
 import "https://github.com/Stefanpt/staking/blob/main/IERC721.sol";
 
 
-contract NFTStaking is Ownable, IERC721Receiver {
+contract ChamberStaking is Ownable, IERC721Receiver {
 
   uint256 public totalStaked;
   
