@@ -6,24 +6,24 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract GracelandNFT is ERC721, Ownable {
+contract NFT is ERC721, Ownable {
   using Strings for uint256;
   using Counters for Counters.Counter;
 
   Counters.Counter private supply;
 
-  string public uriPrefix = "ipfs://QmZXN4kr8JZmDRDvLz2UZBJJXN66TEjwAsaAVx5cCAzKRs/";
+  string public uriPrefix = "";
   string public uriSuffix = ".json";
   string public hiddenMetadataUri;
   
-  uint256 public cost = 1 ether;
+  uint256 public cost = 0.01 ether;
   uint256 public maxSupply = 10000;
   uint256 public maxMintAmountPerTx = 5;
 
   bool public paused = false;
   bool public revealed = true;
 
-  constructor() ERC721("Graceland", "GL") {
+  constructor() ERC721("NFT", "NFT") {
     setHiddenMetadataUri("ipfs://__CID__/hidden.json");
   }
 
