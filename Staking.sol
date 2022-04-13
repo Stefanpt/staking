@@ -21,6 +21,7 @@ contract ERC721Staking is ERC721Holder, Ownable {
 
     // Staker info
     struct Staker {
+        uint256[] tokenIds;
         // Amount of ERC721 Tokens staked
         uint256 amountStaked;
         // Last time of details update for this User
@@ -38,7 +39,7 @@ contract ERC721Staking is ERC721Holder, Ownable {
     mapping(address => Staker) stakers;
     // Mapping of Token Id to staker. Made for the SC to remeber
     // who to send back the ERC721 Token to.
-    mapping(uint256 => address) stakerAddress;
+    mapping(uint256 => address) public stakerAddress;
 
     // Constructor function
     constructor(address _nftCollection, IRewardToken _rewardsToken) {
@@ -62,6 +63,7 @@ contract ERC721Staking is ERC721Holder, Ownable {
                 "Can't stake tokens you don't own!"
             );
             nftCollection.transferFrom(msg.sender, address(this), _tokenIds[i]);
+            stakers[msg.sender].tokenIds.push(_tokenIds[i]);
             stakers[msg.sender].amountStaked++;
             stakerAddress[_tokenIds[i]] = msg.sender;
         }
@@ -108,12 +110,12 @@ contract ERC721Staking is ERC721Holder, Ownable {
     // View //
     //////////
 
-    function userStakeInfo(address _user)
-        public
-        view
-        returns (uint256 _tokensStaked, uint256 _availableRewards)
-    {
+    function userStakeInfo(address _user) public view returns (uint256 _tokensStaked, uint256 _availableRewards) {
         return (stakers[_user].amountStaked, availableRewards(_user));
+    }
+
+    function getStakedTokens(address _user) public view returns (uint256[] memory tokenIds) {
+        return stakers[_user].tokenIds;
     }
 
     function availableRewards(address _user) internal view returns (uint256) {
