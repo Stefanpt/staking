@@ -21,7 +21,7 @@ contract ERC721Staking is ERC721Holder, Ownable {
 
     // Staker info
     struct Staker {
-        uint256[] tokenIds;
+        uint256[] tokenIdsStaked;
         // Amount of ERC721 Tokens staked
         uint256 amountStaked;
         // Last time of details update for this User
@@ -50,8 +50,8 @@ contract ERC721Staking is ERC721Holder, Ownable {
     // If address already has ERC721 Token/s staked, calculate the rewards.
     // For every new Token Id in param transferFrom user to this Smart Contract,
     // increment the amountStaked and map msg.sender to the Token Id of the staked
-    // Token to later send back on withdrawal. Finally give timeOfLastUpdate the
-    // value of now.
+    // Token to later send back on withdrawal and push the tokenId to the 
+    // tokenIdsStaked array. Finally give timeOfLastUpdate the value of now.
     function stake(uint256[] memory _tokenIds) public {
         if (stakers[msg.sender].amountStaked > 0) {
             uint256 rewards = calculateRewards(msg.sender);
@@ -63,7 +63,7 @@ contract ERC721Staking is ERC721Holder, Ownable {
                 "Can't stake tokens you don't own!"
             );
             nftCollection.transferFrom(msg.sender, address(this), _tokenIds[i]);
-            stakers[msg.sender].tokenIds.push(_tokenIds[i]);
+            stakers[msg.sender].tokenIdsStaked.push(_tokenIds[i]);
             stakers[msg.sender].amountStaked++;
             stakerAddress[_tokenIds[i]] = msg.sender;
         }
@@ -82,8 +82,15 @@ contract ERC721Staking is ERC721Holder, Ownable {
         uint256 rewards = calculateRewards(msg.sender);
         stakers[msg.sender].unclaimedRewards += rewards;
         for (uint256 i; i < _tokenIds.length; ++i) {
-            require(stakerAddress[_tokenIds[i]] == msg.sender);
+            require(stakerAddress[_tokenIds[i]] == msg.sender, "You can only wihtdraw your own tokens!");
             stakers[msg.sender].amountStaked--;
+            for (uint256 j; j < stakers[msg.sender].tokenIdsStaked.length; ++j) {
+                if (stakers[msg.sender].tokenIdsStaked[j] == _tokenIds[i]) {
+                    stakers[msg.sender].tokenIdsStaked[j] = stakers[msg.sender]
+                        .tokenIdsStaked[stakers[msg.sender].tokenIdsStaked.length - 1];
+                    stakers[msg.sender].tokenIdsStaked.pop();
+                }
+            }
             nftCollection.transferFrom(address(this), msg.sender, _tokenIds[i]);
         }
         stakers[msg.sender].timeOfLastUpdate = block.timestamp;
@@ -110,13 +117,28 @@ contract ERC721Staking is ERC721Holder, Ownable {
     // View //
     //////////
 
-    function userStakeInfo(address _user) public view returns (uint256 _tokensStaked, uint256 _availableRewards) {
-        return (stakers[_user].amountStaked, availableRewards(_user));
+    // Returns the information of _user address deposit:
+    // the amount of tokens staked, the rewards available
+    // for withdrawal and the Token Ids staked
+    function userStakeInfo(address _user)
+        public
+        view
+        returns (
+            uint256 _amountStaked,
+            uint256 _availableRewards,
+            uint256[] memory _tokenIdsStaked
+        )
+    {
+        return (
+            stakers[_user].amountStaked,
+            availableRewards(_user),
+            stakers[_user].tokenIdsStaked
+        );
     }
 
-    function getStakedTokens(address _user) public view returns (uint256[] memory tokenIds) {
-        return stakers[_user].tokenIds;
-    }
+    /////////////
+    // Internal//
+    /////////////
 
     function availableRewards(address _user) internal view returns (uint256) {
         require(stakers[_user].amountStaked > 0, "User has no tokens staked");
@@ -124,10 +146,6 @@ contract ERC721Staking is ERC721Holder, Ownable {
             calculateRewards(_user);
         return _rewards;
     }
-
-    /////////////
-    // Internal//
-    /////////////
 
     // Calculate rewards for param _staker by calculating the time passed
     // since last update in hours and mulitplying it to ERC721 Tokens Staked
