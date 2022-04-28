@@ -87,7 +87,7 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
                 stakerAddress[_tokenIds[i]] == msg.sender,
                 "You can only wihtdraw your own tokens!"
             );
-            stakerAddress[_tokenIds[i]] == address(0);
+            stakerAddress[_tokenIds[i]] = address(0);
             stakers[msg.sender].amountStaked--;
             for (
                 uint256 j;
