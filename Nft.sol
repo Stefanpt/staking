@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.4 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -14,18 +14,14 @@ contract NFT is ERC721, Ownable {
 
   string public uriPrefix = "";
   string public uriSuffix = ".json";
-  string public hiddenMetadataUri;
   
   uint256 public cost = 0.01 ether;
   uint256 public maxSupply = 10000;
   uint256 public maxMintAmountPerTx = 5;
 
   bool public paused = false;
-  bool public revealed = true;
 
-  constructor() ERC721("NFT", "NFT") {
-    setHiddenMetadataUri("ipfs://__CID__/hidden.json");
-  }
+  constructor() ERC721("NFT", "NFT") {}
 
   modifier mintCompliance(uint256 _mintAmount) {
     require(_mintAmount > 0 && _mintAmount <= maxMintAmountPerTx, "Invalid mint amount!");
@@ -48,11 +44,7 @@ contract NFT is ERC721, Ownable {
     _mintLoop(_receiver, _mintAmount);
   }
 
-  function walletOfOwner(address _owner)
-    public
-    view
-    returns (uint256[] memory)
-  {
+  function walletOfOwner(address _owner)  public view returns (uint256[] memory) {
     uint256 ownerTokenCount = balanceOf(_owner);
     uint256[] memory ownedTokenIds = new uint256[](ownerTokenCount);
     uint256 currentTokenId = 1;
@@ -85,18 +77,10 @@ contract NFT is ERC721, Ownable {
       "ERC721Metadata: URI query for nonexistent token"
     );
 
-    if (revealed == false) {
-      return hiddenMetadataUri;
-    }
-
     string memory currentBaseURI = _baseURI();
     return bytes(currentBaseURI).length > 0
         ? string(abi.encodePacked(currentBaseURI, _tokenId.toString(), uriSuffix))
         : "";
-  }
-
-  function setRevealed(bool _state) public onlyOwner {
-    revealed = _state;
   }
 
   function setCost(uint256 _cost) public onlyOwner {
@@ -105,10 +89,6 @@ contract NFT is ERC721, Ownable {
 
   function setMaxMintAmountPerTx(uint256 _maxMintAmountPerTx) public onlyOwner {
     maxMintAmountPerTx = _maxMintAmountPerTx;
-  }
-
-  function setHiddenMetadataUri(string memory _hiddenMetadataUri) public onlyOwner {
-    hiddenMetadataUri = _hiddenMetadataUri;
   }
 
   function setUriPrefix(string memory _uriPrefix) public onlyOwner {
@@ -138,4 +118,5 @@ contract NFT is ERC721, Ownable {
   function _baseURI() internal view virtual override returns (string memory) {
     return uriPrefix;
   }
+
 }

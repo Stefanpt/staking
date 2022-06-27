@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT LICENSE
-pragma solidity ^0.8.4;
+pragma solidity >=0.8.4 <0.9.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -33,4 +33,5 @@ contract GTokens is ERC20, ERC20Burnable, Ownable {
     function removeController(address controller) external onlyOwner {
         controllers[controller] = false;
     }
+    
 }
