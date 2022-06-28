@@ -29,6 +29,8 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
 
     uint256 private rewardsPerHour = 100000;
 
+    bool public paused = false;
+
     mapping(address => Staker) public stakers;
     mapping(uint256 => address) public stakerAddress;
 
@@ -39,6 +41,7 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
 
 
     function stake(uint256[] memory _tokenIds) external nonReentrant {
+        require(!paused, "The contract has been paused!");
         if (stakers[msg.sender].amountStaked > 0) {
             uint256 rewards = calculateRewards(msg.sender);
             stakers[msg.sender].unclaimedRewards += rewards;
@@ -136,6 +139,10 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
             ((block.timestamp - stakers[_staker].timeOfLastUpdate) *
                 stakers[msg.sender].amountStaked)
         ) * rewardsPerHour) / 3600);
+    }
+
+    function setPaused(bool _state) public onlyOwner {
+        paused = _state;
     }
 
 }
