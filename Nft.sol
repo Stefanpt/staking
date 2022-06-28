@@ -5,8 +5,9 @@ pragma solidity >=0.8.4 <0.9.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract NFT is ERC721, Ownable {
+contract NFT is ERC721, Ownable, ReentrancyGuard {
   using Strings for uint256;
   using Counters for Counters.Counter;
 
@@ -33,7 +34,7 @@ contract NFT is ERC721, Ownable {
     return supply.current();
   }
 
-  function mint(uint256 _mintAmount) public payable mintCompliance(_mintAmount) {
+  function mint(uint256 _mintAmount) public payable mintCompliance(_mintAmount) nonReentrant {
     require(!paused, "The contract is paused!");
     require(msg.value >= cost * _mintAmount, "Insufficient funds!");
 
@@ -117,6 +118,10 @@ contract NFT is ERC721, Ownable {
 
   function _baseURI() internal view virtual override returns (string memory) {
     return uriPrefix;
+  }
+
+  function closeSale() public onlyOwner {
+      maxSupply = totalSupply();
   }
 
 }
