@@ -42,11 +42,8 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
             stakerAddress[_tokenIds[i]] = msg.sender;
         }
 
-        // check against the mapping
         if (isStaker[msg.sender] == false) {
-            // push the unique item to the array
             Stakers.push(msg.sender);
-            // don't forget to set the mapping value as well
             isStaker[msg.sender] = true;
         }
         
@@ -60,6 +57,17 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
             require( stakerAddress[_tokenIds[i]] == msg.sender, "You can only wihtdraw your own tokens!" );
             stakerAddress[_tokenIds[i]] = address(0);
             stakers[msg.sender].amountStaked--;
+
+            if( stakers[msg.sender].amountStaked == 0 ) {
+
+                for ( uint256 k; k < Stakers.length; ++k ) {
+                    if ( Stakers[k] == msg.sender ) {
+                        Stakers[k] = address(0);
+                    }
+                }
+                
+                isStaker[msg.sender] = false;
+            }
 
             for ( uint256 j; j < stakers[msg.sender].tokenIdsStaked.length; ++j ) {
                 if (stakers[msg.sender].tokenIdsStaked[j] == _tokenIds[i]) {
@@ -93,7 +101,13 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
         );
     }
 
-    function dailyCalculateEntries() public {
+    /*
+    *   This function will be called externally by an automated service every 24hrs
+    *   In turn the function calls 'calculateEntires' which calculates the amount of 
+    *   entries of each staker and updates the Stakers struct
+    *   TODO: Update the governance to include approved callers only (instead of only owner)
+    */
+    function dailyCalculateEntries() public onlyOwner {
         for (uint256 i; i < Stakers.length; ++i) {
             calculateEntries(Stakers[i]);
         }
@@ -103,8 +117,13 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
     *   INTERNAL FUNCTIONS
     */
 
+    /*
+    *   Calculates the amount of entries of each staker and updates the Stakers struct
+    *   1 entry / 24hours * the amount of staked tokens
+    */
     function calculateEntries(address _staker) public { // should be internal
         uint _days = (block.timestamp - stakers[_staker].timeOfLastUpdate) / 60;
+
         if ( _days >= 1 ) {
             stakers[_staker].entries += _days * stakers[_staker].amountStaked;
             stakers[_staker].timeOfLastUpdate = block.timestamp;
