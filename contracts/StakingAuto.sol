@@ -23,6 +23,8 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
 
     mapping(address => Staker) public stakers;
     mapping(uint256 => address) public stakerAddress;
+    mapping (address => bool) isStaker;
+    address[] public Stakers;
 
     constructor(IERC721 _nftCollection) {
         nftCollection = _nftCollection;
@@ -38,6 +40,14 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
             stakers[msg.sender].tokenIdsStaked.push(_tokenIds[i]);
             stakers[msg.sender].amountStaked++;
             stakerAddress[_tokenIds[i]] = msg.sender;
+        }
+
+        // check against the mapping
+        if (isStaker[msg.sender] == false) {
+            // push the unique item to the array
+            Stakers.push(msg.sender);
+            // don't forget to set the mapping value as well
+            isStaker[msg.sender] = true;
         }
         
         stakers[msg.sender].timeOfLastUpdate = block.timestamp;
@@ -83,9 +93,9 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
         );
     }
 
-    function dailyCalculateEntries() {
-        for (uint256 i; i < stakers.length; ++i) {
-            calculateEntries(i);
+    function dailyCalculateEntries() public {
+        for (uint256 i; i < Stakers.length; ++i) {
+            calculateEntries(Stakers[i]);
         }
     }
 
@@ -107,4 +117,3 @@ contract ERC721Staking is Ownable, ReentrancyGuard {
     }
 
 }
-
