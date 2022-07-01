@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract NFT is ERC721, Ownable, ReentrancyGuard {
+contract GracelandCollection is ERC721, Ownable, ReentrancyGuard {
   using Strings for uint256;
   using Counters for Counters.Counter;
 

@@ -1,12 +1,12 @@
-from brownie import LotteryStaking, NFTCollection, accounts, chain
+from brownie import LotteryStaking, GracelandCollection, accounts, chain
 
 
 def test_main():
     owner = accounts[0]
-    nft = NFTCollection.deploy({"from": owner})
+    nft = GracelandCollection.deploy({"from": owner})
     lottery = LotteryStaking.deploy(nft.address, {"from": owner})
     for i in range(0, 7):
-        nft.safeMint(accounts[i].address, 10, {"from": owner})
+        nft.mintForAddress(5, accounts[i].address, {"from": owner})
         print(accounts[i].address)
     nft.approve(lottery.address, 1, {"from": owner})
     lottery.stake([1], {"from": owner})
